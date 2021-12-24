@@ -18,7 +18,8 @@ func OpenDB() {
 	db = create_db
 	db.AutoMigrate(&Person{}, &Task{})
 }
-//struct for person data. Use for data communication between DB and server.  
+
+//struct for person data. Use for data communication between DB and server.
 type Person struct {
 	CreatedAt                   time.Time  `json:"-"`
 	UpdatedAt                   time.Time  `json:"-"`
@@ -30,7 +31,8 @@ type Person struct {
 	ID                          string     `json:"id" gorm:"primarykey"`
 	Tasks                       []Task     `json:"-"`
 }
-//struct for task data. Use for data communication between DB and server. 
+
+//struct for task data. Use for data communication between DB and server.
 type Task struct {
 	ID        string     `json:"-" gorm:"primarykey"`
 	CreatedAt time.Time  `json:"-"`
@@ -42,8 +44,9 @@ type Task struct {
 	Status    string     `json:"status"`
 	PersonID  string     `json:"ownerId"`
 }
+
 //struct that store optional data of person and task
-// It purpose is to support optional args in functions (as go not support that).  
+// It purpose is to support optional args in functions (as go not support that).
 type OptParams struct {
 	Name                        *string `json:"name"`
 	Email                       *string `json:"email"`
@@ -53,20 +56,22 @@ type OptParams struct {
 	DueDate                     *string `json:"dueDate"`
 	Status                      string  `json:"status"`
 }
-//create unique id for the new created person row in DB. 
+
+//create unique id for the new created person row in DB.
 func (p *Person) BeforeCreate(tx *gorm.DB) (err error) {
 	p.ID = uuid.NewString()
 	return
 
 }
-//create unique id for the new created task row in DB. 
+
+//create unique id for the new created task row in DB.
 func (t *Task) BeforeCreate(tx *gorm.DB) (err error) {
 	t.ID = uuid.NewString()
 	return
 
 }
 
-func (person *Person)CreatePersonDB(optParams *OptParams) (tx *gorm.DB) {
+func (person *Person) CreatePersonDB(optParams *OptParams) (tx *gorm.DB) {
 	person.Name = *optParams.Name
 	person.Email = *optParams.Email
 	person.FavoriteProgrammingLanguage = *optParams.FavoriteProgrammingLanguage
@@ -75,16 +80,17 @@ func (person *Person)CreatePersonDB(optParams *OptParams) (tx *gorm.DB) {
 	return db.Create(&person)
 
 }
-func (person *Person)GetPersonDB(id string) (tx *gorm.DB) {
-	//gorm.DB.First - query for the 
+func (person *Person) GetPersonDB(id string) (tx *gorm.DB) {
+	//gorm.DB.First - query for the first row that satisfy the condition
 	return db.Where("ID = ?", id).First(&person)
 }
-func (person *Person)GetPeopleDB(people *[]Person) (tx *gorm.DB) {
+func (person *Person) GetPeopleDB(people *[]Person) (tx *gorm.DB) {
 	return db.Find(&people)
 }
-//updte person fields that were included in the json. 
-// if field were not included, it not change in DB. 
-func (person *Person)UpdatePersonDB(optParams *OptParams) (tx *gorm.DB) {
+
+//updte person fields that were included in the json.
+// if field were not included, it not change in DB.
+func (person *Person) UpdatePersonDB(optParams *OptParams) (tx *gorm.DB) {
 	if optParams.Name != nil {
 		person.Name = *optParams.Name
 	}
@@ -96,10 +102,10 @@ func (person *Person)UpdatePersonDB(optParams *OptParams) (tx *gorm.DB) {
 	}
 	return db.Save(&person)
 }
-func (person *Person)DeletePersonDB(id string) {
+func (person *Person) DeletePersonDB(id string) {
 	db.Where("ID = ?", id).Delete(&person)
 }
-func (task *Task)CreateTaskDB(person *Person, params *OptParams) (err error) {
+func (task *Task) CreateTaskDB(person *Person, params *OptParams) (err error) {
 	task.PersonID = person.ID
 	task.Title = *params.Title
 	task.Details = *params.Details
@@ -115,18 +121,18 @@ func (task *Task)CreateTaskDB(person *Person, params *OptParams) (err error) {
 	}
 	return
 }
- 
-func (person *Person) GetTasksDB( status string) {
+
+func (person *Person) GetTasksDB(status string) {
 	if status == "active" || status == "done" {
 		db.Preload("Tasks", "Status = ?", status).First(&person)
 	} else {
 		db.Preload("Tasks").First(&person)
 	}
 }
-func (task *Task)GetTaskDB(id string) (tx *gorm.DB) {
+func (task *Task) GetTaskDB(id string) (tx *gorm.DB) {
 	return db.Where("ID = ?", id).First(&task)
 }
-func (task *Task)UpdateTaskDB( params *OptParams) {
+func (task *Task) UpdateTaskDB(params *OptParams) {
 
 	if params.Title != nil {
 		task.Title = *params.Title
@@ -152,14 +158,14 @@ func (task *Task)UpdateTaskDB( params *OptParams) {
 
 	db.Save(&task)
 }
-func (task *Task)DeleteTaskDB() {
+func (task *Task) DeleteTaskDB() {
 	var person Person
 	person.GetPersonDB(task.PersonID)
 	person.ActiveTaskCount--
 	person.UpdatePersonDB(&OptParams{})
 	db.Delete(&task)
 }
-func (task *Task)SetTaskOwnerDB(ownerId string) {
+func (task *Task) SetTaskOwnerDB(ownerId string) {
 	if task.Status == "active" {
 		var person Person
 		var person1 Person
