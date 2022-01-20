@@ -11,7 +11,8 @@ It built using [golang](https://go.dev/) and [gin](https://github.com/gin-gonic/
 
 **start using it** 
  - you can download backend.exe and run it in command line.
-  or:
+ 
+or:
  - clone the project to the folder you want
  ```bash
   git clone https://github.com/elad773/Go-gin-server-project.git 
