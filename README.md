@@ -7,7 +7,7 @@ It built using [golang](https://go.dev/) and [gin](https://github.com/gin-gonic/
 - This server is run on windos x86/64.
  if you want to run the server without .exe file:
 - go installed (click [this link](https://go.dev/doc/install) if you didn't downloaded/installed go).
-- gcc compiler installed(check first if it compiles and if not you can download Mingw or TDM-GCC).
+- gcc compiler installed(check first if it compiles and if not you can download MinGw or TDM-GCC).
 
 **start using it** 
  - you can download backend.exe and run it in command line.
